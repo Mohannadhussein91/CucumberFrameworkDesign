@@ -25,9 +25,9 @@ Feature: Crater User Management
     
     @invalidTestSets
     Scenario Outline: Invalid login attempts
-    When user enters invalid "<useremail>" and "<password>"
+    When user enters invalid useremail "<useremail>" and password "<password>"
     And clicks on the login button 
-    Then an error message appears
+    Then error messages appear
     And user is not logged in
     
     Examples: 

@@ -7,6 +7,7 @@ import org.junit.Assert;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import pages.CraterCommonPage;
 import pages.CraterDashboardPage;
 import pages.CraterLoginPage;
 import utils.BrowserUtils;
@@ -15,9 +16,10 @@ import utils.TestDataReader;
 
 public class UserManagementSteps {
 	
-	CraterLoginPage carterLogin = new CraterLoginPage();
+	CraterLoginPage craterLogin = new CraterLoginPage();
 	CraterDashboardPage dashboard = new CraterDashboardPage();
 	BrowserUtils utils = new BrowserUtils();
+	CraterCommonPage commonPage = new CraterCommonPage();
 	
 	// valid login test
 	
@@ -28,13 +30,13 @@ public class UserManagementSteps {
 	
 	@When("user enters valid {string} and {string}")
 	public void user_enters_valid_and(String username, String password) {
-		utils.sendKeysWithActionsClass(carterLogin.useremail, username);
-		utils.sendKeysWithActionsClass(carterLogin.password, password);
+		utils.sendKeysWithActionsClass(craterLogin.useremail, username);
+		utils.sendKeysWithActionsClass(craterLogin.password, password);
 	 
 	}
 	@When("clicks on the login button")
 	public void clicks_on_the_login_button() {
-		carterLogin.loginButton.click();
+		craterLogin.loginButton.click();
 	  
 	}
 	
@@ -48,26 +50,50 @@ public class UserManagementSteps {
 	public void user_quits_the_browser() {
 	    Driver.quitDriver();
 	}
+	
+	// invalid login steps
 
 	
 	@When("user enters invalid {string} and {string}")
-	public void user_enters_invalid_and(String invalidUserEmail, String invalidPassword) {
-		utils.sendKeysWithActionsClass(carterLogin.useremail, invalidUserEmail);
-		utils.sendKeysWithActionsClass(carterLogin.password, invalidPassword);
+	public void user_enters_invalid_and(String invalidUseremail, String invalidPassword) {
+		utils.sendKeysWithActionsClass(craterLogin.useremail, invalidUseremail);
+		utils.sendKeysWithActionsClass(craterLogin.password, invalidPassword);
 	}
 
 	@Then("an error message appears")
 	public void an_error_message_appears() {
-		 utils.waitUntilElementVisible(carterLogin.invalidUserErrorMessage);
-		 Assert.assertTrue(carterLogin.invalidUserErrorMessage.isDisplayed());
-		
-	  
+	    utils.waitUntilElementVisible(craterLogin.invalidUserErrorMessage);
+	    Assert.assertTrue(craterLogin.invalidUserErrorMessage.isDisplayed());
 	}
 
 	@Then("user is not logged in")
 	public void user_is_not_logged_in() {
-		Assert.assertTrue(carterLogin.loginButton.isDisplayed());
-		
+		Assert.assertTrue(craterLogin.loginButton.isDisplayed());
+		Assert.assertTrue(Driver.getDriver().getCurrentUrl().contains("login"));
 	}
+	
+	// invalid login scenario outline
+	boolean useremailEmpty;
+	boolean passwordEmpty;
+	@When("user enters invalid useremail {string} and password {string}")
+	public void user_enters_invalid_useremail_and_password(String invalidUseremail, String invalidPassword) {
+		useremailEmpty = invalidUseremail.isBlank();
+		passwordEmpty = invalidPassword.isBlank();
+				
+		utils.sendKeysWithActionsClass(craterLogin.useremail, invalidUseremail);
+		utils.sendKeysWithActionsClass(craterLogin.password, invalidPassword);
+	}
+	
+	@Then("error messages appear")
+	public void error_messages_appear() {
+	    if (useremailEmpty || passwordEmpty) {
+	    	utils.waitUntilElementVisible(craterLogin.fieldRequired);
+		    Assert.assertTrue(craterLogin.fieldRequired.isDisplayed());
+		} else {
+			utils.waitUntilElementVisible(craterLogin.invalidUserErrorMessage);
+			Assert.assertTrue(craterLogin.invalidUserErrorMessage.isDisplayed());
+		}
+	}
+	
 
 }
